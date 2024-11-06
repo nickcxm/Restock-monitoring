@@ -1,11 +1,12 @@
-import cfscrape
-from bs4 import BeautifulSoup
 import asyncio
+import fcntl
 import json
 import os
 import re
-import fcntl
 import sys
+
+import cfscrape
+from bs4 import BeautifulSoup
 from telegram import Bot
 from telegram.constants import ParseMode
 from telegram.error import BadRequest
@@ -73,8 +74,24 @@ async def load_config(filename="config.json"):
         return json.load(f)
 
 
-async def send_notification(config, merchant, stock, stock_quantity, message_id=None):
-    bot = Bot(token=config["telegram_token"])
+async def sendStartMessage(botConfig):
+    bot = Bot(token=botConfig["telegram_token"])
+    try:
+        message = "Bot started successfully!"
+        await bot.send_message(
+            chat_id=botConfig["telegram_chat_id"],
+            text=message,
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        print("Bot started successfully!")
+    except Exception as e:
+        print(f"Error sending start message: {e}")
+
+
+async def send_notification(
+    botConfig, config, merchant, stock, stock_quantity, message_id=None
+):
+    bot = Bot(token=botConfig["telegram_token"])
     try:
         title = f"{merchant['name']}-{stock['title']}"
         tag = escape_markdown(merchant["tag"])
@@ -102,7 +119,7 @@ async def send_notification(config, merchant, stock, stock_quantity, message_id=
         if stock_quantity > 0:
             # 发送新消息
             sent_message = await bot.send_message(
-                chat_id=config["telegram_chat_id"],
+                chat_id=botConfig["telegram_chat_id"],
                 text=message,
                 parse_mode=ParseMode.MARKDOWN,
             )
@@ -113,7 +130,7 @@ async def send_notification(config, merchant, stock, stock_quantity, message_id=
             if message_id:
                 try:
                     await bot.edit_message_text(
-                        chat_id=config["telegram_chat_id"],
+                        chat_id=botConfig["telegram_chat_id"],
                         message_id=message_id,
                         text=message,
                         parse_mode=ParseMode.MARKDOWN,
@@ -132,7 +149,8 @@ async def main():
     try:
         merchant_status = {}
         message_ids = {}  # 用于存储每个商品的消息ID
-
+        botConfig = await load_config("bot.json")
+        await sendStartMessage(botConfig)
         while True:
             config = await load_config()  # 每次循环时重新加载配置文件
             check_interval = config.get("check_interval", 600)  # 更新检查间隔
@@ -153,7 +171,7 @@ async def main():
                     # 当库存有货且之前状态是缺货时，发送新通知
                     if stock_quantity > 0 and not previous_status["in_stock"]:
                         message_id = await send_notification(
-                            config, merchant, stock, stock_quantity
+                            botConfig, config, merchant, stock, stock_quantity
                         )
                         merchant_status.setdefault(merchant["name"], {})[url] = {
                             "in_stock": True
