@@ -1,10 +1,10 @@
 {
-    "telegram_token": "机器人apitoken",
-    "telegram_chat_id": "频道id",
+    "telegram_token": "7252939549:AAHR7EqUxbRe1sHO1oDyqk4rUL8plkjU0pc",
+    "telegram_chat_id": "376135714",
     "merchants": [
-{
+        {
             "name": "📦fiberstate",
-            "tag": "#fiberstate"
+            "tag": "#fiberstate",
             "out_of_stock_text": "Out of Stock",
             "stock_urls": [
                 {
@@ -13,10 +13,25 @@
                     "price": "$119USD/monthly",
                     "hardware_info": "16vCpu，128G，2T，10Gbps，330T Bidirection，1IPv4+1IPv6，7950X，DDR5，Nvme，硬盘可翻倍，高性能独服"
                 }
- ],
+            ],
             "coupon_monthly": "",
             "coupon_annual": ""
-}
+        },
+        {
+            "name": "搬瓦工",
+            "tag": "#bwg",
+            "out_of_stock_text": "Out of Stock",
+            "stock_urls": [
+                {
+                    "url": "https://bandwagonhost.com/cart.php?a=add&pid=147",
+                    "title": "The Plan!",
+                    "price": "99$/年",
+                    "hardware_info": "硬件拉跨"
+                }
+            ],
+            "coupon_monthly": "",
+            "coupon_annual": ""
+        }
     ],
     "check_interval": 30,
     "cooldown_period": 0
